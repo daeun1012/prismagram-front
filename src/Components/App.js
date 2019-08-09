@@ -1,16 +1,15 @@
 import React from 'react';
-// import { gql } from "apollo-boost";
+import { gql } from "apollo-boost";
 import styled, { ThemeProvider } from "styled-components";
 import GlobalStyles from "../Styles/GlobalStyles";
 import Theme from '../Styles/Theme';
 import Router from './Router';
-// import { useQuery } from "react-apollo-hooks";
-import { defaults } from "../Apollo/LocalState";
+import { useQuery } from "react-apollo-hooks";
 import Footer from "./Footer";
 
-// const QUERY = gql`{
-//     isLoggedIn @client
-// }`;
+const QUERY = gql`{
+    isLoggedIn @client
+}`;
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -19,16 +18,14 @@ const Wrapper = styled.div`
 `;
 
 export default () => {
-  // const { data: { isLoggedIn } } = useQuery(QUERY);
-  // console.log(isLoggedIn);
-  console.log(defaults.isLoggedIn);
+  const { data: { isLoggedIn } } = useQuery(QUERY);
   
   return (
   <ThemeProvider theme={Theme}>
     <>
       <GlobalStyles />
       <Wrapper>
-        <Router isLoggedIn={defaults.isLoggedIn}/>
+        <Router isLoggedIn={isLoggedIn}/>
         <Footer />
       </Wrapper>
     </>

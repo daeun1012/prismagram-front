@@ -4,9 +4,16 @@ import App from './Components/App';
 import Client from './Apollo/Client';
 import { ApolloProvider } from "react-apollo-hooks";
 
+// ReactDOM.render(
+//     <ApolloProvider clinet={Client}>
+//         <App />
+//     </ApolloProvider>, 
+//     document.getElementById('root')
+// );
+
 ReactDOM.render(
-    <ApolloProvider clinet={Client}>
+    <ApolloProvider client={Client}>
         <App />
-    </ApolloProvider>, 
+    </ApolloProvider>,
     document.getElementById('root')
 );
