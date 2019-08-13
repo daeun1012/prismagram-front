@@ -2,19 +2,23 @@ import React, {useState} from "react";
 import AuthPresenter from "./AuthPresenter";
 import useInput from "../../Hooks/useInput";
 import { useMutation } from 'react-apollo-hooks';
-import { LOG_IN, CREATE_ACCOUNT } from "./AuthQueries";
+import { LOG_IN, CREATE_ACCOUNT, CONFIRM_SECRET, LOCAL_LOG_IN } from "./AuthQueries";
 import { toast } from "react-toastify";
 
 export default () => {
     const [action, setAction] = useState("logIn");
     const username = useInput("");
     const email = useInput("");
+    const secret = useInput("");
 
     const [requestSecret] = useMutation(LOG_IN, {
         variables: { email: email.value },
         update: (_, data) => {
             const { requestSecret } = data.data;
-            if(!requestSecret) {
+            if(requestSecret) {
+                toast.success("Check your inbox for your login secret");
+                setAction("confirm");
+            } else {
                 toast.error("You don't have an account yet, create one");
                 setTimeout(() => setAction("SignUp"), 3000);
             }
@@ -36,6 +40,15 @@ export default () => {
                 }
           }
       });
+
+      const [confirmSecretMutation] = useMutation(CONFIRM_SECRET, {
+          variables: {
+              email: email.value,
+              secret: secret.value
+          }
+      });
+
+      const [localLogInMutation] = useMutation(LOCAL_LOG_IN);
 
     const onSubmit = async(e) => {
         e.preventDefault();
@@ -62,6 +75,17 @@ export default () => {
             } else {
                 toast.error("All field are required");
             }
+        } else if(action === "confirm") {
+            if(secret.value !== "") {
+                try {
+                    const {data: {confirmSecret: token}} = await confirmSecretMutation();
+                    if(token !== "" && token !== undefined) {
+                        localLogInMutation({variables: {token}});
+                    }
+                } catch {
+                    toast.error("Can't confirm secret");
+                }
+            }
         }
     };
 
@@ -70,6 +94,7 @@ export default () => {
         action={action} 
         username={username} 
         email={email}
+        secret = {secret}
         onSubmit={onSubmit}
         />;
 }
